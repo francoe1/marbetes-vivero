@@ -691,6 +691,180 @@
       cursor: pointer;
       text-decoration: underline;
     }
+
+    /* MOBILE NAVIGATION TABS (Visible en pantallas < 900px) */
+    .mobile-view-tabs {
+      display: none;
+      background: #0f172a;
+      border-bottom: 1px solid var(--border);
+      padding: 6px 10px;
+      gap: 8px;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+
+    .mobile-tab-btn {
+      flex: 1;
+      padding: 9px 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      background: #1e293b;
+      border: 1px solid var(--border);
+      color: #9ca3af;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+
+    .mobile-tab-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: #3b82f6;
+    }
+
+    /* RESPONSIVE SMARTPHONE STYLES */
+    @media screen and (max-width: 900px) {
+      header.app-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 0.65rem 0.85rem;
+      }
+
+      .brand-title {
+        text-align: center;
+      }
+
+      .brand-title h1 {
+        font-size: 0.95rem;
+      }
+
+      .header-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 6px;
+      }
+
+      .header-actions .btn {
+        padding: 0.45rem 0.25rem;
+        font-size: 0.7rem;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .mobile-view-tabs {
+        display: flex;
+      }
+
+      .app-layout {
+        display: block;
+        height: auto;
+        min-height: calc(100vh - 120px);
+        overflow: visible;
+      }
+
+      /* Control de vista activa en celular */
+      .app-layout.view-form .sidebar {
+        display: flex !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        border-right: none;
+      }
+      .app-layout.view-form .preview-container {
+        display: none !important;
+      }
+
+      .app-layout.view-preview .sidebar {
+        display: none !important;
+      }
+      .app-layout.view-preview .preview-container {
+        display: flex !important;
+        width: 100% !important;
+        padding: 0.75rem 0.4rem;
+        overflow-x: auto;
+      }
+
+      /* Inputs optimizados para dedos y evitar zoom de navegador en celular */
+      .form-group input, .form-group select {
+        font-size: 16px !important;
+        padding: 0.5rem 0.6rem;
+      }
+
+      .sidebar-scroll-area {
+        padding: 0.85rem;
+      }
+
+      .view-toolbar {
+        flex-wrap: wrap;
+        border-radius: 8px;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 0.75rem;
+      }
+
+      /* En pantalla de celular, la hoja A4 se adapta al ancho de pantalla */
+      .a4-sheet {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        padding: 6px !important;
+        gap: 6px !important;
+        box-shadow: none !important;
+      }
+
+      .cert-card {
+        height: auto !important;
+        min-height: 125px !important;
+        max-height: none !important;
+        padding: 6px 8px !important;
+        gap: 8px !important;
+      }
+
+      .card-left {
+        width: 72px !important;
+        padding-right: 6px !important;
+      }
+
+      .qr-frame {
+        width: 62px !important;
+        height: 62px !important;
+      }
+
+      .vivero-title {
+        font-size: 0.88rem !important;
+      }
+      .vivero-owner {
+        font-size: 0.72rem !important;
+      }
+      .vivero-address, .vivero-phone {
+        font-size: 0.65rem !important;
+      }
+      .cert-title {
+        font-size: 0.85rem !important;
+      }
+      .cert-law, .cert-reg {
+        font-size: 0.64rem !important;
+      }
+      .field-row {
+        gap: 6px !important;
+      }
+      .field-item {
+        font-size: 0.74rem !important;
+      }
+      .field-label {
+        font-size: 0.74rem !important;
+      }
+      .field-value {
+        font-size: 0.74rem !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -714,8 +888,18 @@
     </div>
   </header>
 
+  <!-- MOBILE TABS -->
+  <nav class="mobile-view-tabs" id="mobile-tabs-bar">
+    <button type="button" class="mobile-tab-btn active" id="mobile-tab-form">
+      Editar Formulario
+    </button>
+    <button type="button" class="mobile-tab-btn" id="mobile-tab-preview">
+      Ver Hoja A4
+    </button>
+  </nav>
+
   <!-- APP LAYOUT -->
-  <div class="app-layout">
+  <div class="app-layout view-form" id="app-layout-main">
 
     <!-- SIDEBAR FORM -->
     <aside class="sidebar">
@@ -1423,6 +1607,28 @@
         btn.disabled = false;
       }
     });
+
+    // Mobile View Switching
+    const mobileTabForm = document.getElementById('mobile-tab-form');
+    const mobileTabPreview = document.getElementById('mobile-tab-preview');
+    const appLayoutMain = document.getElementById('app-layout-main');
+
+    function setMobileView(view) {
+      if (view === 'form') {
+        appLayoutMain.classList.remove('view-preview');
+        appLayoutMain.classList.add('view-form');
+        mobileTabForm.classList.add('active');
+        mobileTabPreview.classList.remove('active');
+      } else {
+        appLayoutMain.classList.remove('view-form');
+        appLayoutMain.classList.add('view-preview');
+        mobileTabPreview.classList.add('active');
+        mobileTabForm.classList.remove('active');
+      }
+    }
+
+    mobileTabForm.addEventListener('click', () => setMobileView('form'));
+    mobileTabPreview.addEventListener('click', () => setMobileView('preview'));
 
     // Startup
     loadFormValues();
