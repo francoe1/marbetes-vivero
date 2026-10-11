@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Marbetes A4 - Vivero Cítrico El Paraisal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
+  <!-- QRCode.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- html2canvas for PNG download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --panel-bg: #111827;
+      --card-bg: #1f2937;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border: #374151;
+      --ink: #111111;
+      --card-flat-bg: #fff6a8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header.app-header {
+      background: #111827;
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-title h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-title p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: #10b981;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #059669;
+    }
+
+    .btn-secondary {
+      background: #1f2937;
+      color: #e5e7eb;
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: #374151;
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.65rem;
+      font-size: 0.75rem;
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.12);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+    .btn-danger:hover {
+      background: #ef4444;
+      color: white;
+    }
+
+    /* MAIN LAYOUT */
+    .app-layout {
+      display: grid;
+      grid-template-columns: 440px 1fr;
+      flex: 1;
+      height: calc(100vh - 58px);
+      overflow: hidden;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      background: var(--panel-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .cards-nav {
+      padding: 0.75rem 1rem 0.5rem 1rem;
+      background: #0f172a;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cards-nav-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .cards-nav-header span {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      font-weight: 700;
+    }
+
+    .cards-chips-container {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+    .cards-chips-container::-webkit-scrollbar {
+      height: 4px;
+    }
+    .cards-chips-container::-webkit-scrollbar-thumb {
+      background: #374151;
+      border-radius: 4px;
+    }
+
+    .card-chip {
+      background: #1f2937;
+      color: #9ca3af;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+
+    .card-chip:hover {
+      background: #374151;
+      color: #fff;
+    }
+
+    .card-chip.active {
+      background: var(--accent);
+      color: white;
+      border-color: #3b82f6;
+    }
+
+    .sidebar-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .card-header-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1f2937;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .card-header-actions span {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #f3f4f6;
+    }
+
+    .form-section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #9ca3af;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-group {
+      margin-bottom: 0.6rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #cbd5e1;
+      margin-bottom: 0.25rem;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      background: #1f2937;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: white;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.82rem;
+      font-family: inherit;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .qr-box {
+      background: #1f2937;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .qr-actions-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-file-label {
+      flex: 1;
+      text-align: center;
+      cursor: pointer;
+      display: inline-block;
+      padding: 5px 8px;
+      font-size: 0.75rem;
+      background: #111827;
+      border: 1px solid var(--border);
+      color: #9ca3af;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .btn-file-label:hover {
+      background: #1f2937;
+      color: #fff;
+    }
+
+    /* PREVIEW CONTAINER */
+    .preview-container {
+      background: #030712;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.25rem;
+      position: relative;
+    }
+
+    .view-toolbar {
+      position: sticky;
+      top: 0;
+      background: rgba(17, 24, 39, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 6px 14px;
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1.25rem;
+      z-index: 20;
+    }
+
+    .view-toolbar span {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .view-toolbar label {
+      font-size: 0.75rem;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    /* A4 SHEET (1 COLUMNA, 4 TARJETAS) */
+    .a4-sheet {
+      width: 210mm;
+      height: 297mm;
+      max-height: 297mm;
+      background: #ffffff;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+      padding: 4mm 4mm;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 3mm;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    /* INDIVIDUAL CITRUS TAG CARD */
+    .cert-card {
+      background: var(--card-flat-bg);
+      background-image: none !important;
+      color: var(--ink);
+      border: 1.5px solid #1a1813;
+      border-radius: 2px;
+      padding: 4px 10px;
+      position: relative;
+      display: flex;
+      gap: 10px;
+      font-family: 'Playfair Display', serif;
+      box-sizing: border-box;
+      height: calc((100% - (3 * 3mm)) / 4);
+      min-height: 66mm;
+      max-height: 69mm;
+      width: 100%;
+      cursor: pointer;
+      transition: outline 0.15s ease;
+      overflow: hidden;
+    }
+
+    .cert-card.selected-in-sheet {
+      outline: 3px solid #2563eb;
+      outline-offset: 1px;
+    }
+
+    .cert-card.paper-yellow {
+      background: #fff6a8 !important;
+    }
+    .cert-card.paper-white {
+      background: #ffffff !important;
+    }
+
+    /* LEFT SIDE: QR COMPACTO */
+    .card-left {
+      width: 84px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-right: 1.5px solid rgba(26, 24, 19, 0.35);
+      padding-right: 8px;
+      flex-shrink: 0;
+    }
+
+    .qr-frame {
+      width: 74px;
+      height: 74px;
+      background: #ffffff;
+      padding: 2px;
+      border: 1px solid #1a1813;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .qr-frame img, .qr-frame canvas {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .qr-caption {
+      margin-top: 3px;
+      text-align: center;
+      font-size: 0.5rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      color: #1a1813;
+      line-height: 1.1;
+    }
+
+    .qr-subcaption {
+      font-size: 0.46rem;
+      font-family: 'Inter', monospace;
+      color: #333333;
+      margin-top: 1px;
+      text-align: center;
+      word-break: break-all;
+    }
+
+    /* RIGHT SIDE: DATA */
+    .card-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+      padding: 1px 0;
+    }
+
+    .card-header {
+      text-align: center;
+    }
+
+    .vivero-title {
+      font-size: 1.12rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      line-height: 1.1;
+      color: #0a0a0a;
+    }
+
+    .vivero-owner {
+      font-size: 0.8rem;
+      font-style: italic;
+      color: #1f1f1f;
+      line-height: 1.1;
+    }
+
+    .vivero-address {
+      font-size: 0.7rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      color: #262626;
+      margin-top: 1px;
+    }
+
+    .vivero-phone {
+      font-size: 0.7rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .cert-badge-section {
+      text-align: center;
+      margin: 1px 0;
+    }
+
+    .cert-title {
+      font-size: 1.08rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #000000;
+      line-height: 1.05;
+    }
+
+    .cert-law {
+      font-size: 0.7rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      color: #262626;
+    }
+
+    .cert-reg {
+      font-size: 0.73rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      color: #111111;
+      letter-spacing: 0.02em;
+    }
+
+    .divider-double {
+      border: none;
+      border-top: 1.5px solid #1a1813;
+      border-bottom: 1px solid #1a1813;
+      height: 3px;
+      margin: 1px 0 3px 0;
+      width: 100%;
+    }
+
+    .fields-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5px;
+      font-family: 'Playfair Display', serif;
+      width: 100%;
+    }
+
+    .field-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .field-item {
+      display: flex;
+      align-items: baseline;
+      flex: 1;
+      font-size: 0.84rem;
+      line-height: 1.25;
+      min-width: 0;
+    }
+
+    .field-item.item-portainjerto {
+      flex: 1.35;
+    }
+    .field-item.item-dav {
+      flex: 0.85;
+    }
+    .field-item.item-cat {
+      flex: 0.95;
+    }
+    .field-item.item-proc {
+      flex: 1.25;
+    }
+
+    .field-label {
+      font-weight: 700;
+      color: #111;
+      margin-right: 4px;
+      flex-shrink: 0;
+      font-size: 0.84rem;
+    }
+
+    .field-value {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 600;
+      font-size: 0.83rem;
+      color: #000;
+      border-bottom: 1px dotted #222;
+      flex: 1;
+      padding-left: 3px;
+      padding-right: 3px;
+      min-height: 1.15rem;
+      white-space: nowrap;
+      overflow: visible;
+    }
+
+    .field-value.badge-val {
+      font-family: 'Inter', sans-serif;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      border-bottom: none;
+    }
+
+    /* PRINT SPECIFIC STYLES */
+    @page {
+      size: A4 portrait;
+      margin: 0mm !important;
+    }
+
+    @media print {
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      html, body {
+        width: 210mm !important;
+        height: 297mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        overflow: hidden !important;
+      }
+
+      .app-header, .sidebar, .view-toolbar, .btn, .print-tip-badge {
+        display: none !important;
+      }
+
+      .app-layout {
+        display: block !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+      }
+
+      .preview-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        overflow: visible !important;
+        display: block !important;
+      }
+
+      #sheets-render-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 210mm !important;
+      }
+
+      .a4-sheet {
+        box-shadow: none !important;
+        margin: 0 auto !important;
+        padding: 4mm 4mm !important;
+        width: 210mm !important;
+        max-width: 210mm !important;
+        height: 297mm !important;
+        max-height: 297mm !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        gap: 3mm !important;
+        page-break-after: always !important;
+        break-after: page !important;
+      }
+
+      .cert-card {
+        width: 100% !important;
+        height: 70mm !important;
+        max-height: 70mm !important;
+        min-height: 70mm !important;
+        margin: 0 !important;
+        padding: 4px 10px !important;
+        box-sizing: border-box !important;
+        border: 1.5px solid #000000 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      .cert-card.selected-in-sheet {
+        outline: none !important;
+      }
+    }
+
+    .batch-actions-btn {
+      font-size: 0.72rem;
+      background: none;
+      border: none;
+      color: #38bdf8;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="brand-title">
+      <h1>Marbetes Cítricos A4 - "El Paraisal"</h1>
+      <p>Vivero Cítrico de Sebastián Canaglia (Chajarí, E.R.)</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" id="btn-export-png" title="Descargar la tarjeta activa como PNG">
+        Descargar Tarjeta (PNG)
+      </button>
+      <button class="btn btn-secondary" id="btn-export-sheet-png" title="Descargar toda la hoja A4 como PNG">
+        Descargar Hoja A4 (PNG)
+      </button>
+      <button class="btn btn-primary" id="btn-print" title="Imprimir hoja A4">
+        Imprimir Hoja A4
+      </button>
+    </div>
+  </header>
+
+  <!-- APP LAYOUT -->
+  <div class="app-layout">
+
+    <!-- SIDEBAR FORM -->
+    <aside class="sidebar">
+
+      <!-- CARDS LIST -->
+      <div class="cards-nav">
+        <div class="cards-nav-header">
+          <span>Tarjetas en la hoja</span>
+          <button class="btn btn-primary btn-sm" id="btn-add-card">+ Nueva Tarjeta</button>
+        </div>
+        <div class="cards-chips-container" id="cards-chips-list"></div>
+      </div>
+
+      <div class="sidebar-scroll-area">
+
+        <!-- ACTIVE CARD BAR -->
+        <div class="card-header-actions">
+          <span id="lbl-active-card-title">Tarjeta 1</span>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn btn-secondary btn-sm" id="btn-duplicate-card">Duplicar</button>
+            <button class="btn btn-danger btn-sm" id="btn-delete-card">Eliminar</button>
+          </div>
+        </div>
+
+        <!-- QR CODE -->
+        <div>
+          <div class="form-section-title">
+            <span>Código QR (Izquierda)</span>
+          </div>
+
+          <div class="qr-box">
+            <div class="form-group" style="margin-bottom: 0.4rem;">
+              <label for="input-qr-content">Enlace / Texto para el QR:</label>
+              <input type="text" id="input-qr-content" placeholder="https://..." value="https://inase.gob.ar/cert/11566">
+            </div>
+
+            <div class="qr-actions-row">
+              <label class="btn-file-label" for="input-qr-file">
+                Subir Imagen de QR
+              </label>
+              <input type="file" id="input-qr-file" accept="image/*" style="display: none;">
+
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-paste-clipboard" style="flex: 1; justify-content: center;">
+                Pegar del Portapapeles
+              </button>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="input-qr-caption">Texto al pie del QR:</label>
+              <input type="text" id="input-qr-caption" value="ESCANEAR PARA TRAZABILIDAD">
+            </div>
+          </div>
+        </div>
+
+        <!-- PLANT DATA -->
+        <div>
+          <div class="form-section-title">
+            <span>Datos de la Planta</span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="input-especie">Especie:</label>
+              <input type="text" id="input-especie" value="Naranjo Dulce">
+            </div>
+            <div class="form-group">
+              <label for="input-cultivar">Cultivar:</label>
+              <input type="text" id="input-cultivar" value="Valencia Late">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="input-portainjerto">Portainjerto:</label>
+              <input type="text" id="input-portainjerto" value="Citrange Troyer">
+            </div>
+            <div class="form-group">
+              <label for="input-dav">DAV Nº:</label>
+              <input type="text" id="input-dav" value="98432/24">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="input-categoria">Categoría:</label>
+              <input type="text" id="input-categoria" value="CERTIFICADA">
+            </div>
+            <div class="form-group">
+              <label for="input-procedencia">Procedencia:</label>
+              <input type="text" id="input-procedencia" value="Col. Freitas">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="input-contenido">Contenido neto:</label>
+            <input type="text" id="input-contenido" value="1 Planta">
+          </div>
+        </div>
+
+        <!-- NURSERY DATA -->
+        <div>
+          <div class="form-section-title">
+            <span>Datos del Vivero</span>
+            <button class="batch-actions-btn" id="btn-copy-vivero-all">Copiar a todas</button>
+          </div>
+          <div class="form-group">
+            <label for="input-vivero-name">Nombre del Vivero:</label>
+            <input type="text" id="input-vivero-name" value='VIVERO CÍTRICO "EL PARAISAL"'>
+          </div>
+          <div class="form-group">
+            <label for="input-vivero-owner">Titular:</label>
+            <input type="text" id="input-vivero-owner" value="de Sebastián Canaglia">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="input-vivero-address">Dirección:</label>
+              <input type="text" id="input-vivero-address" value="Colonia Freitas - Calle Los Ceibos S/N°">
+            </div>
+            <div class="form-group">
+              <label for="input-vivero-city">Localidad / Teléfono:</label>
+              <input type="text" id="input-vivero-city" value="Chajarí, E.R. - Tel.: (03456) 15546638">
+            </div>
+          </div>
+        </div>
+
+        <!-- CERTIFICATION DATA -->
+        <div>
+          <div class="form-section-title">
+            <span>Certificación y Normativa</span>
+          </div>
+          <div class="form-group">
+            <label for="input-cert-title">Título Central:</label>
+            <input type="text" id="input-cert-title" value="PLANTA CERTIFICADA">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="input-cert-law">Marco Legal:</label>
+              <input type="text" id="input-cert-law" value="Ley Nº 20.247 - Art. 9">
+            </div>
+            <div class="form-group">
+              <label for="input-cert-reg">Registro:</label>
+              <input type="text" id="input-cert-reg" value="R.N.C. y F.S. Nº 11566 / J1">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- PREVIEW AREA -->
+    <main class="preview-container">
+
+      <div class="view-toolbar">
+        <span>Formato: 1 columna (4 tarjetas por hoja A4)</span>
+        <span style="color: #374151;">|</span>
+        <label>
+          <span>Fondo:</span>
+          <select id="select-card-color" style="background: #1f2937; color: white; border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; font-size: 0.75rem;">
+            <option value="paper-yellow" selected>Amarillo liso</option>
+            <option value="paper-white">Blanco liso</option>
+          </select>
+        </label>
+        <span style="color: #374151;">|</span>
+        <span style="color: #10b981;">Al imprimir: elegir Márgenes "Ninguno"</span>
+      </div>
+
+      <div id="sheets-render-container"></div>
+
+    </main>
+
+  </div>
+
+  <script>
+    const defaultTemplate = {
+      viveroName: 'VIVERO CÍTRICO "EL PARAISAL"',
+      viveroOwner: "de Sebastián Canaglia",
+      viveroAddress: "Colonia Freitas - Calle Los Ceibos S/N°",
+      viveroCity: "Chajarí, E.R. - Tel.: (03456) 15546638",
+      certTitle: "PLANTA CERTIFICADA",
+      certLaw: "Ley Nº 20.247 - Art. 9",
+      certReg: "R.N.C. y F.S. Nº 11566 / J1",
+      categoria: "CERTIFICADA",
+      procedencia: "Col. Freitas",
+      contenido: "1 Planta",
+      qrType: "text",
+      qrText: "https://inase.gob.ar/cert/11566",
+      qrImageData: null,
+      qrCaption: "ESCANEAR PARA TRAZABILIDAD"
+    };
+
+    let cardsList = [
+      {
+        id: 1,
+        ...defaultTemplate,
+        especie: "Naranjo Dulce",
+        cultivar: "Valencia Late",
+        portainjerto: "Citrange Troyer",
+        dav: "98432/24",
+        qrText: "https://inase.gob.ar/cert/11566/valencia-late"
+      },
+      {
+        id: 2,
+        ...defaultTemplate,
+        especie: "Mandarino",
+        cultivar: "Clemenules",
+        portainjerto: "Citrange Troyer",
+        dav: "98433/24",
+        qrText: "https://inase.gob.ar/cert/11566/clemenules"
+      },
+      {
+        id: 3,
+        ...defaultTemplate,
+        especie: "Mandarino",
+        cultivar: "Nova",
+        portainjerto: "Trifolio",
+        dav: "98434/24",
+        qrText: "https://inase.gob.ar/cert/11566/nova"
+      },
+      {
+        id: 4,
+        ...defaultTemplate,
+        especie: "Limonero",
+        cultivar: "Eureka",
+        portainjerto: "Citrumelo",
+        dav: "98435/24",
+        qrText: "https://inase.gob.ar/cert/11566/eureka"
+      }
+    ];
+
+    let activeCardIndex = 0;
+    let cardColorMode = "paper-yellow";
+
+    const inputFields = {
+      viveroName: document.getElementById('input-vivero-name'),
+      viveroOwner: document.getElementById('input-vivero-owner'),
+      viveroAddress: document.getElementById('input-vivero-address'),
+      viveroCity: document.getElementById('input-vivero-city'),
+      certTitle: document.getElementById('input-cert-title'),
+      certLaw: document.getElementById('input-cert-law'),
+      certReg: document.getElementById('input-cert-reg'),
+      especie: document.getElementById('input-especie'),
+      cultivar: document.getElementById('input-cultivar'),
+      portainjerto: document.getElementById('input-portainjerto'),
+      dav: document.getElementById('input-dav'),
+      categoria: document.getElementById('input-categoria'),
+      procedencia: document.getElementById('input-procedencia'),
+      contenido: document.getElementById('input-contenido'),
+      qrText: document.getElementById('input-qr-content'),
+      qrCaption: document.getElementById('input-qr-caption')
+    };
+
+    const chipsListContainer = document.getElementById('cards-chips-list');
+    const sheetsContainer = document.getElementById('sheets-render-container');
+    const lblActiveCardTitle = document.getElementById('lbl-active-card-title');
+    const selectCardColor = document.getElementById('select-card-color');
+    const inputQrFile = document.getElementById('input-qr-file');
+
+    function setCardCustomQRImage(dataUrl) {
+      const cur = cardsList[activeCardIndex];
+      cur.qrType = 'image';
+      cur.qrImageData = dataUrl;
+      renderSheets();
+    }
+
+    function handleFile(file) {
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (e) => setCardCustomQRImage(e.target.result);
+      reader.readAsDataURL(file);
+    }
+
+    inputQrFile.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+    });
+
+    window.addEventListener('paste', (e) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          const blob = items[i].getAsFile();
+          handleFile(blob);
+          break;
+        }
+      }
+    });
+
+    document.getElementById('btn-paste-clipboard').addEventListener('click', async () => {
+      try {
+        const clipboardItems = await navigator.clipboard.read();
+        for (const item of clipboardItems) {
+          const imageType = item.types.find(type => type.startsWith('image/'));
+          if (imageType) {
+            const blob = await item.getType(imageType);
+            handleFile(blob);
+            alert('Código QR pegado en esta tarjeta');
+            return;
+          }
+        }
+        alert('Copiá una imagen y presioná Ctrl + V.');
+      } catch (err) {
+        alert('Presioná directamente Ctrl + V en tu teclado para pegar la imagen.');
+      }
+    });
+
+    function loadFormValues() {
+      const card = cardsList[activeCardIndex];
+      if (!card) return;
+      lblActiveCardTitle.textContent = `Tarjeta ${activeCardIndex + 1} (${card.cultivar || card.especie || 'Sin nombre'})`;
+
+      for (const [key, input] of Object.entries(inputFields)) {
+        if (card[key] !== undefined) {
+          input.value = card[key];
+        }
+      }
+    }
+
+    function setupInputListeners() {
+      for (const [key, input] of Object.entries(inputFields)) {
+        input.addEventListener('input', () => {
+          const card = cardsList[activeCardIndex];
+          if (card) {
+            card[key] = input.value;
+            if (key === 'qrText' && card.qrType === 'image') {
+              card.qrType = 'text';
+              card.qrImageData = null;
+            }
+            renderChips();
+            updateCardInSheet(activeCardIndex);
+          }
+        });
+      }
+    }
+
+    function renderChips() {
+      chipsListContainer.innerHTML = '';
+      cardsList.forEach((card, idx) => {
+        const chip = document.createElement('div');
+        chip.className = `card-chip ${idx === activeCardIndex ? 'active' : ''}`;
+        chip.innerHTML = `
+          <span>#${idx + 1}</span>
+          <span>${card.cultivar || card.especie || 'Tarjeta ' + (idx + 1)}</span>
+        `;
+        chip.addEventListener('click', () => {
+          activeCardIndex = idx;
+          loadFormValues();
+          renderChips();
+          highlightActiveCardInSheet();
+        });
+        chipsListContainer.appendChild(chip);
+      });
+    }
+
+    document.getElementById('btn-add-card').addEventListener('click', () => {
+      const prev = cardsList[cardsList.length - 1] || defaultTemplate;
+      const newCard = {
+        ...prev,
+        id: Date.now(),
+        dav: prev.dav ? (parseInt(prev.dav) ? parseInt(prev.dav) + 1 : prev.dav) : "",
+        cultivar: ""
+      };
+      cardsList.push(newCard);
+      activeCardIndex = cardsList.length - 1;
+      loadFormValues();
+      renderChips();
+      renderSheets();
+    });
+
+    document.getElementById('btn-duplicate-card').addEventListener('click', () => {
+      const current = cardsList[activeCardIndex];
+      const copy = {
+        ...current,
+        id: Date.now(),
+        cultivar: current.cultivar ? current.cultivar + " (Copia)" : "Copia"
+      };
+      cardsList.splice(activeCardIndex + 1, 0, copy);
+      activeCardIndex = activeCardIndex + 1;
+      loadFormValues();
+      renderChips();
+      renderSheets();
+    });
+
+    document.getElementById('btn-delete-card').addEventListener('click', () => {
+      if (cardsList.length <= 1) {
+        alert('Debe haber al menos una tarjeta.');
+        return;
+      }
+      if (confirm(`¿Eliminar la Tarjeta ${activeCardIndex + 1}?`)) {
+        cardsList.splice(activeCardIndex, 1);
+        if (activeCardIndex >= cardsList.length) activeCardIndex = cardsList.length - 1;
+        loadFormValues();
+        renderChips();
+        renderSheets();
+      }
+    });
+
+    document.getElementById('btn-copy-vivero-all').addEventListener('click', () => {
+      const cur = cardsList[activeCardIndex];
+      if (!confirm('¿Copiar los datos de vivero y legislación de esta tarjeta a todas las demás?')) return;
+      cardsList.forEach(c => {
+        c.viveroName = cur.viveroName;
+        c.viveroOwner = cur.viveroOwner;
+        c.viveroAddress = cur.viveroAddress;
+        c.viveroCity = cur.viveroCity;
+        c.certTitle = cur.certTitle;
+        c.certLaw = cur.certLaw;
+        c.certReg = cur.certReg;
+        c.procedencia = cur.procedencia;
+      });
+      renderSheets();
+      alert('Datos copiados a todas las tarjetas.');
+    });
+
+    selectCardColor.addEventListener('change', (e) => {
+      cardColorMode = e.target.value;
+      renderSheets();
+    });
+
+    function createCardElement(card, idx) {
+      const cardEl = document.createElement('div');
+      cardEl.className = `cert-card ${cardColorMode} ${idx === activeCardIndex ? 'selected-in-sheet' : ''}`;
+      cardEl.id = `card-dom-${idx}`;
+      cardEl.dataset.index = idx;
+
+      cardEl.innerHTML = `
+        <div class="card-left">
+          <div class="qr-frame" id="qr-frame-${idx}"></div>
+          <div class="qr-caption">${escapeHtml(card.qrCaption || '')}</div>
+          <div class="qr-subcaption">SENASA / INASE</div>
+        </div>
+
+        <div class="card-right">
+          <div class="card-header">
+            <div class="vivero-title">${escapeHtml(card.viveroName)}</div>
+            <div class="vivero-owner">${escapeHtml(card.viveroOwner)}</div>
+            <div class="vivero-address">${escapeHtml(card.viveroAddress)}</div>
+            <div class="vivero-phone">${escapeHtml(card.viveroCity)}</div>
+          </div>
+
+          <div class="cert-badge-section">
+            <div class="cert-title">${escapeHtml(card.certTitle)}</div>
+            <div class="cert-law">${escapeHtml(card.certLaw)}</div>
+            <div class="cert-reg">${escapeHtml(card.certReg)}</div>
+          </div>
+
+          <div class="divider-double"></div>
+
+          <div class="fields-container">
+            <div class="field-row">
+              <div class="field-item">
+                <span class="field-label">Especie:</span>
+                <span class="field-value">${escapeHtml(card.especie || '....................')}</span>
+              </div>
+              <div class="field-item">
+                <span class="field-label">Cultivar:</span>
+                <span class="field-value">${escapeHtml(card.cultivar || '....................')}</span>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field-item item-portainjerto">
+                <span class="field-label">Portainjerto:</span>
+                <span class="field-value">${escapeHtml(card.portainjerto || '....................')}</span>
+              </div>
+              <div class="field-item item-dav">
+                <span class="field-label">DAV Nº:</span>
+                <span class="field-value">${escapeHtml(card.dav || '....................')}</span>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field-item item-cat">
+                <span class="field-label">Categoría:</span>
+                <span class="field-value badge-val">${escapeHtml(card.categoria || 'CERTIFICADA')}</span>
+              </div>
+              <div class="field-item item-proc">
+                <span class="field-label">Procedencia:</span>
+                <span class="field-value">${escapeHtml(card.procedencia || 'Col. Freitas')}</span>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field-item">
+                <span class="field-label">Contenido neto:</span>
+                <span class="field-value">${escapeHtml(card.contenido || '1 Planta')}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      cardEl.addEventListener('click', () => {
+        activeCardIndex = idx;
+        loadFormValues();
+        renderChips();
+        highlightActiveCardInSheet();
+      });
+
+      return cardEl;
+    }
+
+    function renderQRInto(container, card) {
+      container.innerHTML = '';
+      if (card.qrType === 'image' && card.qrImageData) {
+        const img = document.createElement('img');
+        img.src = card.qrImageData;
+        img.alt = 'QR';
+        container.appendChild(img);
+      } else {
+        new QRCode(container, {
+          text: card.qrText || 'https://vivero-elparaisal.com',
+          width: 70,
+          height: 70,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      }
+    }
+
+    function highlightActiveCardInSheet() {
+      document.querySelectorAll('.cert-card').forEach((el) => {
+        if (parseInt(el.dataset.index) === activeCardIndex) {
+          el.classList.add('selected-in-sheet');
+        } else {
+          el.classList.remove('selected-in-sheet');
+        }
+      });
+    }
+
+    function updateCardInSheet(index) {
+      const existing = document.getElementById(`card-dom-${index}`);
+      if (!existing) {
+        renderSheets();
+        return;
+      }
+      const card = cardsList[index];
+      const newCardEl = createCardElement(card, index);
+      existing.replaceWith(newCardEl);
+
+      const frame = document.getElementById(`qr-frame-${index}`);
+      if (frame) renderQRInto(frame, card);
+    }
+
+    function renderSheets() {
+      sheetsContainer.innerHTML = '';
+      const cardsPerPage = 4;
+      const totalPages = Math.ceil(cardsList.length / cardsPerPage);
+
+      for (let pageIdx = 0; pageIdx < totalPages; pageIdx++) {
+        const sheet = document.createElement('div');
+        sheet.className = 'a4-sheet';
+        
+        const start = pageIdx * cardsPerPage;
+        const pageCards = cardsList.slice(start, start + cardsPerPage);
+
+        pageCards.forEach((card, offset) => {
+          const globalIdx = start + offset;
+          const cardEl = createCardElement(card, globalIdx);
+          sheet.appendChild(cardEl);
+        });
+
+        sheetsContainer.appendChild(sheet);
+
+        pageCards.forEach((card, offset) => {
+          const globalIdx = start + offset;
+          const frame = document.getElementById(`qr-frame-${globalIdx}`);
+          if (frame) renderQRInto(frame, card);
+        });
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    document.getElementById('btn-print').addEventListener('click', () => {
+      window.print();
+    });
+
+    // Helper: convierte canvases de QR dentro de un elemento a imágenes fijas para que html2canvas las capture sin fallar
+    function prepareCanvasForExport(element) {
+      const qrCanvases = element.querySelectorAll('.qr-frame canvas');
+      const cleanupFns = [];
+
+      qrCanvases.forEach(canvas => {
+        try {
+          const img = document.createElement('img');
+          img.src = canvas.toDataURL('image/png');
+          img.style.width = '70px';
+          img.style.height = '70px';
+          img.style.display = 'block';
+          canvas.parentNode.appendChild(img);
+          canvas.style.display = 'none';
+
+          cleanupFns.push(() => {
+            canvas.style.display = 'block';
+            img.remove();
+          });
+        } catch (e) {
+          console.warn('QR canvas conversion note:', e);
+        }
+      });
+
+      return () => {
+        cleanupFns.forEach(fn => fn());
+      };
+    }
+
+    // Helper de descarga directa en formato PNG con Blob
+    function triggerDownload(canvas, filename) {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          const a = document.createElement('a');
+          a.href = canvas.toDataURL('image/png');
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+          a.remove();
+        }, 1000);
+      }, 'image/png');
+    }
+
+    // Exportar Tarjeta Individual en PNG
+    document.getElementById('btn-export-png').addEventListener('click', async () => {
+      const targetCard = document.getElementById(`card-dom-${activeCardIndex}`);
+      if (!targetCard) return;
+
+      const btn = document.getElementById('btn-export-png');
+      const origText = btn.innerHTML;
+      btn.innerHTML = 'Descargando...';
+      btn.disabled = true;
+
+      const cleanup = prepareCanvasForExport(targetCard);
+
+      try {
+        const bgCol = cardColorMode === 'paper-yellow' ? '#fff6a8' : '#ffffff';
+        const canvas = await html2canvas(targetCard, {
+          scale: 3,
+          backgroundColor: bgCol,
+          useCORS: true,
+          allowTaint: true,
+          logging: false
+        });
+
+        const cultivo = cardsList[activeCardIndex].cultivar || `tarjeta-${activeCardIndex + 1}`;
+        const filename = `marbete-el-paraisal-${cultivo.toLowerCase().replace(/[^a-z0-9]/g, '-')}.png`;
+        triggerDownload(canvas, filename);
+      } catch (err) {
+        console.error('Error generando PNG:', err);
+        alert('Hubo un inconveniente al generar el PNG. Podés usar "Imprimir Hoja A4" y elegir "Guardar como PDF".');
+      } finally {
+        cleanup();
+        btn.innerHTML = origText;
+        btn.disabled = false;
+      }
+    });
+
+    // Exportar Hoja A4 Completa en PNG
+    document.getElementById('btn-export-sheet-png').addEventListener('click', async () => {
+      const targetSheet = document.querySelector('.a4-sheet');
+      if (!targetSheet) return;
+
+      const btn = document.getElementById('btn-export-sheet-png');
+      const origText = btn.innerHTML;
+      btn.innerHTML = 'Descargando...';
+      btn.disabled = true;
+
+      const cleanup = prepareCanvasForExport(targetSheet);
+
+      try {
+        const canvas = await html2canvas(targetSheet, {
+          scale: 2,
+          backgroundColor: '#ffffff',
+          useCORS: true,
+          allowTaint: true,
+          logging: false
+        });
+
+        const filename = `hoja-a4-marbetes-el-paraisal.png`;
+        triggerDownload(canvas, filename);
+      } catch (err) {
+        console.error('Error generando PNG de hoja:', err);
+        alert('Hubo un inconveniente al exportar la hoja completa.');
+      } finally {
+        cleanup();
+        btn.innerHTML = origText;
+        btn.disabled = false;
+      }
+    });
+
+    // Startup
+    loadFormValues();
+    renderChips();
+    setupInputListeners();
+    renderSheets();
+  </script>
+</body>
+</html>
